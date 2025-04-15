@@ -1,0 +1,5 @@
+*.bin
+game.bin.*
+.DS_Store
+/build
+/build_wasm
