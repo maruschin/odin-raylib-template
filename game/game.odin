@@ -1,7 +1,7 @@
 package game
-import "core:encoding/json"
 import "core:os"
 import rl "vendor:raylib"
+import assets "assets"
 
 PixelWindowHeight :: 180
 
@@ -24,6 +24,7 @@ Game :: struct {
 	state:  GameState,
 	camera: rl.Camera2D,
 	run:    bool,
+	assets: assets.Assets,
 }
 
 GameState :: enum {
@@ -34,7 +35,7 @@ GameState :: enum {
 Game__init :: proc() -> Game {
 	window := Window{"Game Template", 1280, 720, 60, rl.ConfigFlags{.WINDOW_RESIZABLE}}
 	Window__set(&window)
-	return {state = .Menu, run = true}
+	return {state = .Menu, run = true, assets = assets.load()}
 }
 
 Game__controller :: proc(game: ^Game) {
@@ -44,20 +45,17 @@ Game__controller :: proc(game: ^Game) {
 
 Game__should_run :: proc(game: ^Game) -> bool {
 	when ODIN_OS != .JS {
-		// Never run this proc in browser. It contains a 16 ms sleep on web!
 		if rl.WindowShouldClose() {
 			return false
 		}
 	}
-
 	return game.run
 }
 
-
 Game__close :: proc(game: ^Game) {
 	rl.CloseWindow()
+	assets.unload(game.assets)
 }
-
 
 Game__parent_window_size_changed :: proc(w, h: int) {
 	rl.SetWindowSize(i32(w), i32(h))
